@@ -1,0 +1,91 @@
+{
+  "entities": {
+    "Category": {
+      "title": "Category",
+      "description": "Food category (e.g., Rice, Sugar, Oil)",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Category name" }
+      },
+      "required": ["name"]
+    },
+    "Unit": {
+      "title": "Unit",
+      "description": "Measurement unit (e.g., kg, Liter)",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Unit name" }
+      },
+      "required": ["name"]
+    },
+    "Package": {
+      "title": "Package",
+      "description": "Packaging type (e.g., Bag, Carton)",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Package name" }
+      },
+      "required": ["name"]
+    },
+    "Brand": {
+      "title": "Brand",
+      "description": "Company or product brand",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Brand name" }
+      },
+      "required": ["name"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Detailed food product item including prices",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "categoryId": { "type": "string" },
+        "unitId": { "type": "string" },
+        "packageId": { "type": "string" },
+        "brandId": { "type": "string" },
+        "variants": { 
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sizeName": { "type": "string" },
+              "agentPrice": { "type": "number" },
+              "wholesalePrice": { "type": "number" },
+              "retailPrice": { "type": "number" }
+            }
+          }
+        },
+        "image": { "type": "string" },
+        "description": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["name", "categoryId", "brandId"]
+    }
+  },
+  "firestore": {
+    "categories": {
+      "schema": "Category",
+      "description": "Collection of food categories"
+    },
+    "units": {
+      "schema": "Unit",
+      "description": "Collection of measurement units"
+    },
+    "packages": {
+      "schema": "Package",
+      "description": "Collection of packaging types"
+    },
+    "brands": {
+      "schema": "Brand",
+      "description": "Collection of brands"
+    },
+    "products": {
+      "schema": "Product",
+      "description": "Main product collection"
+    }
+  }
+}

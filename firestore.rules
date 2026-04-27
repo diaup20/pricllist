@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation for simple entities (Category, Brand, Unit, Package)
+    function isValidSimpleEntity(data) {
+      return data.keys().hasAll(['name', 'createdAt', 'updatedAt']) &&
+             data.keys().size() == 3 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100;
+    }
+
+    // Validation for Product
+    function isValidProduct(data) {
+      return data.keys().hasAll(['name', 'categoryId', 'brandId', 'createdAt', 'updatedAt']) &&
+             data.name is string && data.name.size() > 0 &&
+             data.categoryId is string &&
+             data.brandId is string &&
+             (data.get('variants', []) is list);
+    }
+
+    // Generic rules for admin access
+    // Note: For simplicity in this applet, any signed-in user is treated as admin.
+    // In production, we would check for a specific role.
+    
+    match /categories/{id} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidSimpleEntity(incoming());
+      allow update: if isSignedIn() && isValidSimpleEntity(incoming()) && incoming().createdAt == existing().createdAt;
+      allow delete: if isSignedIn();
+    }
+
+    match /brands/{id} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidSimpleEntity(incoming());
+      allow update: if isSignedIn() && isValidSimpleEntity(incoming()) && incoming().createdAt == existing().createdAt;
+      allow delete: if isSignedIn();
+    }
+
+    match /units/{id} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidSimpleEntity(incoming());
+      allow update: if isSignedIn() && isValidSimpleEntity(incoming()) && incoming().createdAt == existing().createdAt;
+      allow delete: if isSignedIn();
+    }
+
+    match /packages/{id} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidSimpleEntity(incoming());
+      allow update: if isSignedIn() && isValidSimpleEntity(incoming()) && incoming().createdAt == existing().createdAt;
+      allow delete: if isSignedIn();
+    }
+
+    match /products/{id} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidProduct(incoming());
+      allow update: if isSignedIn() && isValidProduct(incoming()) && incoming().createdAt == existing().createdAt;
+      allow delete: if isSignedIn();
+    }
+  }
+}
